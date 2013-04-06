@@ -5,6 +5,7 @@ http://www.pjrc.com/teensy/pinout.html
 
 #include <Bounce.h>
 
+
 #define DEBOUNCE 10  // Number of ms to debounce
 
 #define NUMBER_OF_BUTTONS 8
@@ -24,9 +25,11 @@ Bounce buttons[NUMBER_OF_BUTTONS] = {
 };
 
 // Define pins for the RGB LED
-const int RGB_RED = 4;
-const int RGB_GREEN = 20;
-const int RGB_BLUE = 21;
+const byte RGB_RED = 4;
+const byte RGB_GREEN = 5;
+const byte RGB_BLUE = 9;
+
+const byte BUZZER_PIN = 12;
 
 void setup()   {
   Serial.begin(38400);
@@ -41,46 +44,50 @@ void setup()   {
   pinMode(RGB_BLUE, OUTPUT);
   
   analogWrite(RGB_RED, 250);
-  analogWrite(RGB_GREEN, 255);
-  analogWrite(RGB_BLUE, 255);
+  analogWrite(RGB_GREEN, 250);
+  analogWrite(RGB_BLUE, 250);
   
+  // Onboard LED to ON
   pinMode(11, OUTPUT);  
+  digitalWrite(11, HIGH);
 }
 
-void checkButtons() {
-    for (int i = 0; i < NUMBER_OF_BUTTONS; i++) {
-      if (buttons[i].update() && buttons[i].read()) {
-        Serial.println(i);
-    }
-}
+void buzz(unsigned int freq, unsigned long duration){
+  tone(BUZZER_PIN, freq, duration);
 }
 
 void loop()                     
 {
-    
-  checkButtons(); 
-
-  // Blink LED for debugging, just to see that it works
-  digitalWrite(11, HIGH);
-  delay(100);
-  digitalWrite(11, LOW); 
-  delay(300);  
+  for (int i = 0; i < NUMBER_OF_BUTTONS; i++) {
+    if (buttons[i].update() && buttons[i].read()) {
+      buttonPress(i);
+    }
+  }
+  int bytecount=0;
+  byte incomingByte;
+   while (Serial.available() && bytecount < 10) {
+    incomingByte = Serial.read();
+Serial.println(incomingByte);
+if (incomingByte == 49){
+  buzz(100,900);
+}
+if (incomingByte == 50){
+  buzz(300,300);
 }
 
-
+    bytecount++;
+  }
+}
 
 void buttonPress(int buttonNumber) {
   Serial.println(buttonNumber);
-  switch (buttonNumber){
-   case 0:
-     analogWrite(RGB_RED, 200);
-     break;
-   case 1:
-     analogWrite(RGB_GREEN, 200);
-     break;
-   case 2:
-     analogWrite(RGB_BLUE, 200);
-     break;
-  }
+  
+  static int r;
+  static int g;
+  static int b;
+  
+  
+  
+  buzz(buttonNumber*30 + 30, 500);
 }
 
