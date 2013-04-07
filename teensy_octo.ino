@@ -1,12 +1,18 @@
 /**
- * Teensy Octo
+ * Teensy Octo v1.0
+ *
+ * Custom-built USB peripheral with eight buttons, a RGB LED and a Piezo speaker.
+ * Based on the Teensy 2 microcontroller - http://www.pjrc.com/teensy
  * 
- * @author <david@sqroot.eu>
+ * Made as a birthday present to Waher (http://waher.net/about-waher-net)
+ * 
+ * @author David <david@sqroot.eu> 2013
  * 
  * Useful links:
  * 
  * http://www.pjrc.com/teensy/td_libs_Bounce.html - About button bouncing
  * http://www.pjrc.com/teensy/pinout.html - Teensy pinout diagram
+ * http://www.pjrc.com/teensy/td_usage.html - Reprogramming
 **/
 
 #include <Bounce.h>
@@ -32,7 +38,7 @@ Bounce buttons[NUMBER_OF_BUTTONS] = {
 // Define PWM pins for the RGB LED
 const byte RGB_RED = 4;
 const byte RGB_GREEN = 5;
-const byte RGB_BLUE = 9;
+const byte RGB_BLUE = 23;
 
 // The Piezo buzzer sits in this PWM pin
 const byte BUZZER_PIN = 12;
@@ -55,12 +61,8 @@ void setup() {
   
   // The LED is OFF by default
   setLED(255, 255, 255);
-  
-  // Onboard LED to ON for debugging
-  pinMode(11, OUTPUT);  
-  digitalWrite(11, HIGH);
 
-  Serial.println("Teensy Octo v1.0 by A. Roots 2013. Who are you?"); // I wonder whether he gets it without reading the source...
+  Serial.println("Teensy Octo by A. Roots 2013. Who are you?"); // I wonder whether he gets it without reading the source...
 }
 
 /**
@@ -83,10 +85,15 @@ void loop()
 **/
 void processButtonPress() {
   for (int i = 0; i < NUMBER_OF_BUTTONS; i++) {
+
+    // By default, "detect" a button press when the button is released
     if (buttons[i].update() && buttons[i].read()) {
-      
+
+      // Send pressed button index over serial
+      // Software on the computer listens to it and takes appropriate action      
+      Serial.print("buttonPress:")
       Serial.println(i);  
-      buzz(i*30 + 30, 500);
+      buzz(2500, 25);
     
     }
   }
@@ -180,7 +187,7 @@ void processSerialCommand(){
   } else if (command == "led") { // Light LED
     setLED(param1, param2, param3);
   } else if (command == "help") { // Get help
-      Serial.println("http://github.com/anroots/teensy_octo");
+      Serial.println("http://github.com/anroots/teensy-octo");
   } else if (command == "kristo"){ // Easteregg
     kristo();
   } else {
