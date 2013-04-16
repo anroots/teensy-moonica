@@ -1,7 +1,7 @@
 /**
  * Teensy Octo v1.0
  *
- * Custom-built USB peripheral with eight buttons, a RGB LED and a Piezo speaker.
+ * Custom-built USB peripheral with eight buttons, two PWM RGB LEDs and a Piezo buzzer.
  * Based on the Teensy 2 microcontroller - http://www.pjrc.com/teensy
  * 
  * Created as a birthday present to Waher (http://waher.net/about-waher-net)
@@ -98,7 +98,7 @@ void processButtonPress() {
       byte buttonNumber = i+1;
 
       if (buttons[i].fallingEdge()) { // Pressed 
-          buzz(40*(i+1), 100);
+          buzz(80*(i+1), 100);
           Joystick.button(buttonNumber, 1);
           Serial.print("buttonPress: ");
           Serial.println(buttonNumber);
@@ -269,6 +269,9 @@ void processSerialCommand(){
   }
 }
 
+/**
+ * Print short help message
+**/
 void printHelp(){
   Serial.println("");
   Serial.println("=== Available serial commands: ===");
