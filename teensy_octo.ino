@@ -62,7 +62,9 @@ void setup() {
   // The LED is OFF by default
   setLED(255, 255, 255);
 
-  Serial.println("Teensy Octo by A. Roots 2013. Who are you?"); // I wonder whether he gets it without reading the source...
+  Serial.println("Teensy Octo by A. Roots 2013.");
+  Serial.println("Waiting for button presses.");
+  Serial.println("For a list of available serial commands, type 'help'");
 }
 
 /**
@@ -86,15 +88,20 @@ void loop()
 void processButtonPress() {
   for (int i = 0; i < NUMBER_OF_BUTTONS; i++) {
 
-    // By default, "detect" a button press when the button is released
-    if (buttons[i].update() && buttons[i].read()) {
+    if (buttons[i].update()) { // If button state changed...
 
-      // Send pressed button index over serial
-      // Software on the computer listens to it and takes appropriate action      
-      Serial.print("buttonPress:")
-      Serial.println(i);  
-      buzz(2500, 25);
-    
+      byte buttonNumber = i+1;
+
+      if (buttons[i].fallingEdge()) { // Pressed 
+          buzz(40*(i+1), 100);
+          Joystick.button(buttonNumber, 1);
+          Serial.print("buttonPress: ");
+          Serial.println(buttonNumber);
+      } else { // Released
+          Joystick.button(buttonNumber, 0);
+          Serial.print("buttonRelease: ");
+          Serial.println(buttonNumber);
+      }
     }
   }
 }
@@ -183,17 +190,37 @@ void processSerialCommand(){
   unsigned long param3 = stringToInt(getToken(serialInput, 3));
 
   if (command == "buzz"){ // Make sound
+    startWork();
     buzz(param1, param2);
+    endWork();
   } else if (command == "led") { // Light LED
+    startWork();
     setLED(param1, param2, param3);
+    endWork();
   } else if (command == "help") { // Get help
       Serial.println("http://github.com/anroots/teensy-octo");
   } else if (command == "kristo"){ // Easteregg
+    startWork();
     kristo();
+    endWork();
   } else {
       Serial.print("Unknown command: "); 
       Serial.println(command);
   }
+}
+
+/**
+ * Indicate that the device is currently busy
+**/
+void startWork(){
+  Serial.println("Working...");
+}
+
+/**
+ * Indicate that the device is ready to receive commands
+**/
+void endWork(){
+  Serial.println("Ready.");
 }
 
 /**
