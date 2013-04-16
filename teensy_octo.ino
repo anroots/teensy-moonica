@@ -19,9 +19,17 @@
 
 #define DEBOUNCE 10  // Number of ms to debounce
 #define NUMBER_OF_BUTTONS 8
+#define NUMBER_OF_LEDS 6 // 2 RGB LEDs
 
 // Define digital pins for the buttons
 const byte BUTTON_PINS[] = {0, 1, 2, 3, 7, 8, 20, 21};
+
+// Define PWM pins for the RGB LED
+// LED1-R, LED1-G, LED1-B; LED2-R, LED2-G, LED2-B
+const byte LED_PINS[] = {9, 5, 10, 14, 12, 15};
+
+// The Piezo buzzer sits in this PWM pin
+const byte BUZZER_PIN = 4;
 
 // Initialize button objects
 Bounce buttons[NUMBER_OF_BUTTONS] = {
@@ -35,14 +43,6 @@ Bounce buttons[NUMBER_OF_BUTTONS] = {
   Bounce( BUTTON_PINS[7], DEBOUNCE)
 };
 
-// Define PWM pins for the RGB LED
-const byte RGB_RED = 5;
-const byte RGB_GREEN = 9;
-const byte RGB_BLUE = 10;
-
-// The Piezo buzzer sits in this PWM pin
-const byte BUZZER_PIN = 4;
-
 /**
  * Setup function - run once on power-on
 **/
@@ -50,21 +50,25 @@ void setup() {
   Serial.begin(9600);
   
   // Initialize pushbutton pins as inputs with the internal pullup resistor enabled
-  for (int i = 0; i < NUMBER_OF_BUTTONS; i++) {
+  for (byte i = 0; i < NUMBER_OF_BUTTONS; i++) {
       pinMode(BUTTON_PINS[i], INPUT_PULLUP);
   }
 
-  // Set RGB LED pins as output
-  pinMode(RGB_RED, OUTPUT);  
-  pinMode(RGB_GREEN, OUTPUT);
-  pinMode(RGB_BLUE, OUTPUT);
-  
-  // The LED is OFF by default
-  setLED(255, 255, 255);
+  // Initialize LED pins
+  for (byte i = 0; i < NUMBER_OF_LEDS; i++) {
+    pinMode(LED_PINS[i], OUTPUT);
+    analogWrite(LED_PINS[i], 255);
+  }
 
-  Serial.println("Teensy Octo by A. Roots 2013.");
-  Serial.println("Waiting for button presses.");
-  Serial.println("For a list of available serial commands, type 'help'");
+  // Print welcome message over serial
+  Serial.print("Teensy Octo by A. Roots 2013. Booted in ");
+  Serial.print(millis());
+  Serial.println("ms - which is amazingly fast.");
+
+  printHelp();
+  Serial.println("");
+  Serial.println("Waiting for button presses or serial commands.");
+  Serial.println("");
 }
 
 /**
@@ -86,7 +90,8 @@ void loop()
  * Detect and handle button presses
 **/
 void processButtonPress() {
-  for (int i = 0; i < NUMBER_OF_BUTTONS; i++) {
+
+   for (int i = 0; i < NUMBER_OF_BUTTONS; i++) {
 
     if (buttons[i].update()) { // If button state changed...
 
@@ -97,13 +102,62 @@ void processButtonPress() {
           Joystick.button(buttonNumber, 1);
           Serial.print("buttonPress: ");
           Serial.println(buttonNumber);
+
       } else { // Released
           Joystick.button(buttonNumber, 0);
           Serial.print("buttonRelease: ");
           Serial.println(buttonNumber);
+          
+          // Trigger easter egg?
+          if (triggerEasterEgg(i)) {
+            kristo();
+          }
       }
     }
   }
+}
+
+/**
+ * A little state machine for detecting button combinations and triggering the easter egg
+**/
+bool triggerEasterEgg(int currentButton){
+
+  static unsigned long lastButtonPressedOn = 0; 
+
+  static byte easterEggStateMachine[3] = {}; // Last three button presses
+  static byte currentIndex = 0; // Current index in the easterEggStateMachine
+  byte secretCombination[3] = {0, 0, 7}; // "Correct" combination
+  
+  if (currentIndex > 0 && millis() - lastButtonPressedOn > 3000){
+    currentIndex = 0; // Reset sequence, too slow!
+    lastButtonPressedOn = millis();
+  }
+
+  // Save current button
+  easterEggStateMachine[currentIndex] = currentButton;
+
+  if (currentIndex == 2) { // All three buttons pressed
+    currentIndex = 0;
+
+    // Check that the last three buttons were indeed entered in the correct sequence
+    for (int i = 0; i<2; i++) {
+      if (secretCombination[i] != easterEggStateMachine[i]) {
+        return false;
+      }
+    }
+    return true; // All three numbers matched
+  }
+  
+  currentIndex++;
+  lastButtonPressedOn = millis();
+  return false;
+}
+
+/**
+ * Set LED1, see setLED(byte r, byte g, byte b, byte ledNumber)
+**/
+void setLED(byte r, byte g, byte b) {
+  setLED(r, g, b, 0);
 }
 
 /**
@@ -112,11 +166,13 @@ void processButtonPress() {
  * r - The intensity of the RED LED, 0 - 255
  * g - The intensity of the GREEN LED, 0 - 255
  * b - The intensity of the BLUE LED, 0 - 255
+ * ledNumber - Either 0 or 1, indicates which LED to set
 **/
-void setLED(byte r, byte g, byte b){
-  analogWrite(RGB_RED, r);
-  analogWrite(RGB_GREEN, g);
-  analogWrite(RGB_BLUE, b);
+void setLED(byte r, byte g, byte b, byte ledNumber){
+  byte offset = 3*ledNumber;
+  analogWrite(LED_PINS[0+offset], r);
+  analogWrite(LED_PINS[1+offset], g);
+  analogWrite(LED_PINS[2+offset], b);
 }
 
 /**
@@ -193,13 +249,17 @@ void processSerialCommand(){
     startWork();
     buzz(param1, param2);
     endWork();
-  } else if (command == "led") { // Light LED
+  } else if (command == "led1") { // Light LED
     startWork();
     setLED(param1, param2, param3);
     endWork();
+  } else if (command == "led2") {
+    startWork();
+    setLED(param1, param2, param3, 1);
+    endWork();
   } else if (command == "help") { // Get help
-      Serial.println("http://github.com/anroots/teensy-octo");
-  } else if (command == "kristo"){ // Easteregg
+      printHelp();
+  } else if (command == "kristo"){ // Easter egg
     startWork();
     kristo();
     endWork();
@@ -207,6 +267,17 @@ void processSerialCommand(){
       Serial.print("Unknown command: "); 
       Serial.println(command);
   }
+}
+
+void printHelp(){
+  Serial.println("");
+  Serial.println("=== Available serial commands: ===");
+  Serial.println("");
+  Serial.println("buzz frequency duration");
+  Serial.println("led1 r g b");
+  Serial.println("led2 r g b");
+  Serial.println("");
+  Serial.println("More info: http://github.com/anroots/teensy-octo");  
 }
 
 /**
