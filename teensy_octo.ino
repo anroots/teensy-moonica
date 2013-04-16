@@ -4,7 +4,7 @@
  * Custom-built USB peripheral with eight buttons, a RGB LED and a Piezo speaker.
  * Based on the Teensy 2 microcontroller - http://www.pjrc.com/teensy
  * 
- * Made as a birthday present to Waher (http://waher.net/about-waher-net)
+ * Created as a birthday present to Waher (http://waher.net/about-waher-net)
  * 
  * @author David <david@sqroot.eu> 2013
  * 
@@ -21,7 +21,7 @@
 #define NUMBER_OF_BUTTONS 8
 
 // Define digital pins for the buttons
-const byte BUTTON_PINS[] = {0, 1, 2, 3, 13, 16, 17, 18};
+const byte BUTTON_PINS[] = {0, 1, 2, 3, 7, 8, 20, 21};
 
 // Initialize button objects
 Bounce buttons[NUMBER_OF_BUTTONS] = {
@@ -36,12 +36,12 @@ Bounce buttons[NUMBER_OF_BUTTONS] = {
 };
 
 // Define PWM pins for the RGB LED
-const byte RGB_RED = 4;
-const byte RGB_GREEN = 5;
-const byte RGB_BLUE = 23;
+const byte RGB_RED = 5;
+const byte RGB_GREEN = 9;
+const byte RGB_BLUE = 10;
 
 // The Piezo buzzer sits in this PWM pin
-const byte BUZZER_PIN = 12;
+const byte BUZZER_PIN = 4;
 
 /**
  * Setup function - run once on power-on
