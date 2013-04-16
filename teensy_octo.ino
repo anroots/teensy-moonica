@@ -25,7 +25,7 @@
 const byte BUTTON_PINS[] = {0, 1, 2, 3, 7, 8, 20, 21};
 
 // Define PWM pins for the RGB LED
-// LED1-R, LED1-G, LED1-B; LED2-R, LED2-G, LED2-B
+// LED0-R, LED0-G, LED0-B; LED1-R, LED1-G, LED1-B
 const byte LED_PINS[] = {9, 5, 10, 14, 12, 15};
 
 // The Piezo buzzer sits in this PWM pin
@@ -83,7 +83,7 @@ void loop()
   // Receive and proccess commands sent from the PC over serial
   processSerialCommand();
   
-  delay(10);
+  delay(5);
 }
 
 /**
@@ -154,13 +154,6 @@ bool triggerEasterEgg(int currentButton){
 }
 
 /**
- * Set LED1, see setLED(byte r, byte g, byte b, byte ledNumber)
-**/
-void setLED(byte r, byte g, byte b) {
-  setLED(r, g, b, 0);
-}
-
-/**
  * Set the RGB LED values
  *
  * r - The intensity of the RED LED, 0 - 255
@@ -168,7 +161,7 @@ void setLED(byte r, byte g, byte b) {
  * b - The intensity of the BLUE LED, 0 - 255
  * ledNumber - Either 0 or 1, indicates which LED to set
 **/
-void setLED(byte r, byte g, byte b, byte ledNumber){
+void setLED(byte r, byte g, byte b, byte ledNumber) {
   byte offset = 3*ledNumber;
   analogWrite(LED_PINS[0+offset], r);
   analogWrite(LED_PINS[1+offset], g);
@@ -181,8 +174,16 @@ void setLED(byte r, byte g, byte b, byte ledNumber){
  * freq - The frequency of the tone in Hz
  * duration -  The duration of the tone in milliseconds
 **/
-void buzz(unsigned int freq, unsigned long duration){ 
+void buzz(unsigned long freq, unsigned long duration) { 
   tone(BUZZER_PIN, freq, duration);
+}
+
+
+/**
+ * Stop playing the tone
+**/
+void noBuzz() {
+  noTone(BUZZER_PIN);
 }
 
 /**
@@ -249,11 +250,15 @@ void processSerialCommand(){
     startWork();
     buzz(param1, param2);
     endWork();
-  } else if (command == "led1") { // Light LED
+  } else if (command == "nobuzz") {
     startWork();
-    setLED(param1, param2, param3);
+    noBuzz();
     endWork();
-  } else if (command == "led2") {
+  } else if (command == "led0") { // Light LED
+    startWork();
+    setLED(param1 > 255 ? 255 : param1, param2 > 255 ? 255 : param2, param3 > 255 ? 255 : param3, 0);
+    endWork();
+  } else if (command == "led1") {
     startWork();
     setLED(param1, param2, param3, 1);
     endWork();
@@ -269,6 +274,7 @@ void processSerialCommand(){
   }
 }
 
+
 /**
  * Print short help message
 **/
@@ -277,8 +283,9 @@ void printHelp(){
   Serial.println("=== Available serial commands: ===");
   Serial.println("");
   Serial.println("buzz frequency duration");
+  Serial.println("nobuzz");
+  Serial.println("led0 r g b");
   Serial.println("led1 r g b");
-  Serial.println("led2 r g b");
   Serial.println("");
   Serial.println("More info: http://github.com/anroots/teensy-octo");  
 }
