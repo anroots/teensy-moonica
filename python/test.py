@@ -18,7 +18,6 @@ def main():
     print "Testing LED-s"
     for i in range(0, 2):
 
-        print "Individual RGB colors" % i
         print "LED %s, Red" % i
         hold()
         octo.led(0, 255, 255, i)
@@ -30,7 +29,6 @@ def main():
         octo.led(255, 255, 0, i)
         hold()
 
-        print "Color combinations" % i
         for r in range(0, 255):
             sys.stdout.write("LED %s, RED: %s%%\r" % (i, r * 100 / 255))
             sys.stdout.flush()

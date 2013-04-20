@@ -80,6 +80,10 @@ class Octo:
         return False
 
     def read_raw(self):
+        """
+        Get a line from the serial interface
+        :return:
+        """
         return self.ser.readline().strip('\n')
 
     def reset(self):
@@ -98,4 +102,5 @@ class Octo:
         """
         Close serial port on class destruction
         """
-        self.ser.close()
+        if hasattr(self,'ser'):
+            self.ser.close()
