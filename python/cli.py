@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 
-# A CLI wrapper for the Teensy Octo.
-# Allows to control the output devices of the Octo via the command line.
+"""
+A CLI wrapper for the Teensy Octo.
+Allows to control the output devices of the Octo via the command line.
+"""
 
 import argparse
 import sys

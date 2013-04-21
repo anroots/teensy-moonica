@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
-# Test suite for the Teensy Octo Python library
+"""
+Test suite for the Teensy Octo Python library
+"""
 
 import time
 import sys

@@ -1,7 +1,12 @@
+"""
+A Python wrapper for the Teensy Octo project.
+
+Exposes methods to read and write to the device over the serial interface.
+"""
+
 import serial
 import sys
 import time
-
 
 class Octo:
 
@@ -13,7 +18,7 @@ class Octo:
         try:
             self.ser = serial.Serial(address, 9600, timeout=3)
         except:
-            print "Couldn not open address %s" % address
+            print "Could not open address %s" % address
             sys.exit(1)
 
     def buzz(self, freq, duration):
@@ -62,21 +67,23 @@ class Octo:
         """
         self.ser.write("nobuzz")
 
-    def read_button(self, button_number):
+    def read_buttons(self):
         """
-        Try to read a button event from the serial line
-
-        :param button_number: Button number to read, 1..8
-        :return: Either BUTTON_PRESSED, BUTTON_RELEASED constants or False if the event was not found
+        Read the buttons and try to return the pressed (active) button and its state.
+        If no button is currently pressed / released, return False
+        :return: An array of two values, the first being the button number [1..8], the second one of the state constants
         """
         serial_data = self.read_raw().strip()
+
         if len(serial_data) == 0:
             return False
 
-        if serial_data == "buttonPress: " + str(button_number):
-            return self.BUTTON_PRESSED
-        if serial_data == "buttonRelease: " + str(button_number):
-            return self.BUTTON_RELEASED
+        # The Teensy sends us events on button press / release
+        if "buttonPress: " in serial_data:
+            return [int(serial_data[13]), self.BUTTON_PRESSED] # Parse out btn number
+        elif "buttonRelease: " in serial_data:
+            return [int(serial_data[15]), self.BUTTON_RELEASED]
+
         return False
 
     def read_raw(self):

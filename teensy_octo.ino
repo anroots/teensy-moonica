@@ -98,7 +98,6 @@ void processButtonPress() {
       byte buttonNumber = i+1;
 
       if (buttons[i].fallingEdge()) { // Pressed 
-          buzz(80*(i+1), 100);
           Joystick.button(buttonNumber, 1);
           Serial.print("buttonPress: ");
           Serial.println(buttonNumber);
