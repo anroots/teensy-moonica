@@ -93,6 +93,13 @@ class Octo:
         """
         return self.ser.readline().strip('\n')
 
+    def send_raw(self,string):
+        """
+        Send a raw serial command to the Octo
+        :param string:
+        """
+        self.ser.write(str(string))
+
     def reset(self):
         """
         Reset (switch off) both LED-s and the buzzer

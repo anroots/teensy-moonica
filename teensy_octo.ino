@@ -13,7 +13,7 @@
  * http://www.pjrc.com/teensy/td_libs_Bounce.html - About button bouncing
  * http://www.pjrc.com/teensy/pinout.html - Teensy pinout diagram
  * http://www.pjrc.com/teensy/td_usage.html - Reprogramming
-**/
+ **/
 
 #include <Bounce.h>
 
@@ -22,11 +22,13 @@
 #define NUMBER_OF_LEDS 6 // 2 RGB LEDs
 
 // Define digital pins for the buttons
-const byte BUTTON_PINS[] = {0, 1, 2, 3, 7, 8, 20, 21};
+const byte BUTTON_PINS[] = {
+  0, 1, 2, 3, 7, 8, 20, 21};
 
 // Define PWM pins for the RGB LED
 // LED0-R, LED0-G, LED0-B; LED1-R, LED1-G, LED1-B
-const byte LED_PINS[] = {9, 5, 10, 14, 12, 15};
+const byte LED_PINS[] = {
+  9, 5, 10, 14, 12, 15};
 
 // The Piezo buzzer sits in this PWM pin
 const byte BUZZER_PIN = 4;
@@ -41,115 +43,75 @@ Bounce buttons[NUMBER_OF_BUTTONS] = {
   Bounce( BUTTON_PINS[5], DEBOUNCE),
   Bounce( BUTTON_PINS[6], DEBOUNCE),
   Bounce( BUTTON_PINS[7], DEBOUNCE)
-};
+  };
 
-/**
- * Setup function - run once on power-on
-**/
-void setup() {
-  Serial.begin(9600);
-  
-  // Initialize pushbutton pins as inputs with the internal pullup resistor enabled
-  for (byte i = 0; i < NUMBER_OF_BUTTONS; i++) {
+  /**
+   * Setup function - run once on power-on
+   **/
+  void setup() {
+    Serial.begin(9600);
+
+    // Initialize pushbutton pins as inputs with the internal pullup resistor enabled
+    for (byte i = 0; i < NUMBER_OF_BUTTONS; i++) {
       pinMode(BUTTON_PINS[i], INPUT_PULLUP);
+    }
+
+    // Initialize LED pins
+    for (byte i = 0; i < NUMBER_OF_LEDS; i++) {
+      pinMode(LED_PINS[i], OUTPUT);
+      analogWrite(LED_PINS[i], 255);
+    }
+
+    // Print welcome message over serial
+    Serial.print("Teensy Octo by A. Roots 2013. Booted in ");
+    Serial.print(millis());
+    Serial.println("ms - which is amazingly fast.");
+
+    printHelp();
+    Serial.println("");
+    Serial.println("Waiting for button presses or serial commands.");
+    Serial.println("");
   }
-
-  // Initialize LED pins
-  for (byte i = 0; i < NUMBER_OF_LEDS; i++) {
-    pinMode(LED_PINS[i], OUTPUT);
-    analogWrite(LED_PINS[i], 255);
-  }
-
-  // Print welcome message over serial
-  Serial.print("Teensy Octo by A. Roots 2013. Booted in ");
-  Serial.print(millis());
-  Serial.println("ms - which is amazingly fast.");
-
-  printHelp();
-  Serial.println("");
-  Serial.println("Waiting for button presses or serial commands.");
-  Serial.println("");
-}
 
 /**
  * Main loop - the program keeps repeating this forever, as long as there is power
-**/
+ **/
 void loop()                     
 {
-  
+
   // Detect and handle button presses
   processButtonPress();
-  
+
   // Receive and proccess commands sent from the PC over serial
   processSerialCommand();
-  
+
   delay(5);
 }
 
 /**
  * Detect and handle button presses
-**/
+ **/
 void processButtonPress() {
 
-   for (int i = 0; i < NUMBER_OF_BUTTONS; i++) {
+  for (int i = 0; i < NUMBER_OF_BUTTONS; i++) {
 
     if (buttons[i].update()) { // If button state changed...
 
       byte buttonNumber = i+1;
 
       if (buttons[i].fallingEdge()) { // Pressed 
-          Joystick.button(buttonNumber, 1);
-          Serial.print("buttonPress: ");
-          Serial.println(buttonNumber);
+        Joystick.button(buttonNumber, 1);
+        Serial.print("buttonPress: ");
+        Serial.println(buttonNumber);
 
-      } else { // Released
-          Joystick.button(buttonNumber, 0);
-          Serial.print("buttonRelease: ");
-          Serial.println(buttonNumber);
-          
-          // Trigger easter egg?
-          if (triggerEasterEgg(i)) {
-            kristo();
-          }
+      } 
+      else { // Released
+        Joystick.button(buttonNumber, 0);
+        Serial.print("buttonRelease: ");
+        Serial.println(buttonNumber);
       }
     }
   }
-}
-
-/**
- * A little state machine for detecting button combinations and triggering the easter egg
-**/
-bool triggerEasterEgg(int currentButton){
-
-  static unsigned long lastButtonPressedOn = 0; 
-
-  static byte easterEggStateMachine[3] = {}; // Last three button presses
-  static byte currentIndex = 0; // Current index in the easterEggStateMachine
-  byte secretCombination[3] = {0, 0, 7}; // "Correct" combination
-  
-  if (currentIndex > 0 && millis() - lastButtonPressedOn > 3000){
-    currentIndex = 0; // Reset sequence, too slow!
-    lastButtonPressedOn = millis();
-  }
-
-  // Save current button
-  easterEggStateMachine[currentIndex] = currentButton;
-
-  if (currentIndex == 2) { // All three buttons pressed
-    currentIndex = 0;
-
-    // Check that the last three buttons were indeed entered in the correct sequence
-    for (int i = 0; i<2; i++) {
-      if (secretCombination[i] != easterEggStateMachine[i]) {
-        return false;
-      }
-    }
-    return true; // All three numbers matched
-  }
-  
-  currentIndex++;
-  lastButtonPressedOn = millis();
-  return false;
 }
 
 /**
@@ -159,7 +121,7 @@ bool triggerEasterEgg(int currentButton){
  * g - The intensity of the GREEN LED, 0 - 255
  * b - The intensity of the BLUE LED, 0 - 255
  * ledNumber - Either 0 or 1, indicates which LED to set
-**/
+ **/
 void setLED(byte r, byte g, byte b, byte ledNumber) {
   byte offset = 3*ledNumber;
   analogWrite(LED_PINS[0+offset], r);
@@ -172,7 +134,7 @@ void setLED(byte r, byte g, byte b, byte ledNumber) {
  * 
  * freq - The frequency of the tone in Hz
  * duration -  The duration of the tone in milliseconds
-**/
+ **/
 void buzz(unsigned long freq, unsigned long duration) { 
   tone(BUZZER_PIN, freq, duration);
 }
@@ -180,7 +142,7 @@ void buzz(unsigned long freq, unsigned long duration) {
 
 /**
  * Stop playing the tone
-**/
+ **/
 void noBuzz() {
   noTone(BUZZER_PIN);
 }
@@ -191,19 +153,20 @@ void noBuzz() {
  * Used to extract serial arguments
  * 
  * http://stackoverflow.com/a/14824108/401554
-**/
+ **/
 String getToken(String data, int index)
 {
   char separator = ' ';
   int found = 0;
-  int strIndex[] = {0, -1};
+  int strIndex[] = {
+    0, -1  };
   int maxIndex = data.length()-1;
 
   for(int i=0; i<=maxIndex && found<=index; i++){
     if(data.charAt(i)==separator || i==maxIndex){
-        found++;
-        strIndex[0] = strIndex[1]+1;
-        strIndex[1] = (i == maxIndex) ? i+1 : i;
+      found++;
+      strIndex[0] = strIndex[1]+1;
+      strIndex[1] = (i == maxIndex) ? i+1 : i;
     }
   }
 
@@ -212,31 +175,31 @@ String getToken(String data, int index)
 
 /**
  * Read serial interface and return a string of sent data
-**/
+ **/
 String getSerialCommand() {
-  
+
   String serialInput = "";
   char character;
 
   while(Serial.available()) {
-      character = Serial.read();
-      serialInput.concat(character);
+    character = Serial.read();
+    serialInput.concat(character);
   }
-  
+
   return serialInput;
 }
 
 /**
  * Receive serial input and proccess it
-**/
+ **/
 void processSerialCommand(){
- 
+
   String serialInput = getSerialCommand();
-  
+
   if (serialInput == "") {
     return;
   }
-  
+
   // The first "word" is always the command
   String command = getToken(serialInput, 0);
 
@@ -249,34 +212,40 @@ void processSerialCommand(){
     startWork();
     buzz(param1, param2);
     endWork();
-  } else if (command == "nobuzz") {
+  } 
+  else if (command == "nobuzz") {
     startWork();
     noBuzz();
     endWork();
-  } else if (command == "led0") { // Light LED
+  } 
+  else if (command == "led0") { // Light LED
     startWork();
     setLED(param1 > 255 ? 255 : param1, param2 > 255 ? 255 : param2, param3 > 255 ? 255 : param3, 0);
     endWork();
-  } else if (command == "led1") {
+  } 
+  else if (command == "led1") {
     startWork();
     setLED(param1, param2, param3, 1);
     endWork();
-  } else if (command == "help") { // Get help
-      printHelp();
-  } else if (command == "kristo"){ // Easter egg
+  } 
+  else if (command == "help") { // Get help
+    printHelp();
+  } 
+  else if (command == "kristo"){ // Easter egg
     startWork();
     kristo();
     endWork();
-  } else {
-      Serial.print("Unknown command: "); 
-      Serial.println(command);
+  } 
+  else {
+    Serial.print("Unknown command: "); 
+    Serial.println(command);
   }
 }
 
 
 /**
  * Print short help message
-**/
+ **/
 void printHelp(){
   Serial.println("");
   Serial.println("=== Available serial commands: ===");
@@ -291,14 +260,14 @@ void printHelp(){
 
 /**
  * Indicate that the device is currently busy
-**/
+ **/
 void startWork(){
   Serial.println("Working...");
 }
 
 /**
  * Indicate that the device is ready to receive commands
-**/
+ **/
 void endWork(){
   Serial.println("Ready.");
 }
@@ -307,7 +276,7 @@ void endWork(){
  * Convert a string into an integer
  *
  * http://christianscode.blogspot.com/2012/05/convert-string-to-integer.html
-**/
+ **/
 int stringToInt(String thisString) {
   int i, value, length;
   length = thisString.length();
@@ -326,20 +295,20 @@ int stringToInt(String thisString) {
  * Play Kristo's theme through the buzz function.
  * 
  * http://garagelab.com/profiles/blogs/how-to-use-tone-function-arduino-playing-the-james-bond-theme
-**/
+ **/
 void kristo(){
 
   // Note frequencies
   int melody[] = {
-  330,349,349,349,349,330,330,330,
-  330,392,392,392,392,330,330,330,
-  330,349,349,349,349,330,330,330,
-  330,392,392,392,392,330,330,330,
-  622,587,494,440,494,
-  330,392,622,587,392,494,
-  494,740,698,494,587,932,
-  880,698,880,1245,1175,0
-};
+    330,349,349,349,349,330,330,330,
+    330,392,392,392,392,330,330,330,
+    330,349,349,349,349,330,330,330,
+    330,392,392,392,392,330,330,330,
+    622,587,494,440,494,
+    330,392,622,587,392,494,
+    494,740,698,494,587,932,
+    880,698,880,1245,1175,0
+  };
 
   // Note duration: 1 = whole note, 2 = half note, 4 = quarter note, 8 = eighth note, etc.
   int noteDurations[] = {
@@ -362,3 +331,4 @@ void kristo(){
     delay(duration*1.2);
   }
 }
+
