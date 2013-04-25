@@ -1,8 +1,11 @@
 /**
  * Teensy Octo v1.0
  *
- * Custom-built USB peripheral with eight buttons, two PWM RGB LEDs and a Piezo buzzer.
- * Based on the Teensy 2 microcontroller - http://www.pjrc.com/teensy
+ * This is the C / Arduino firmware for the Teensy Octo,
+ * a custom-built USB peripheral with eight buttons, two
+ * PWM RGB LEDs and a Piezo buzzer.
+ * 
+ * The microcontroller in use is Teensy 2.0 - http://www.pjrc.com/teensy
  * 
  * Created as a birthday present to Waher (http://waher.net/about-waher-net)
  * 
@@ -13,27 +16,28 @@
  * http://www.pjrc.com/teensy/td_libs_Bounce.html - About button bouncing
  * http://www.pjrc.com/teensy/pinout.html - Teensy pinout diagram
  * http://www.pjrc.com/teensy/td_usage.html - Reprogramming
+ * https://github.com/anroots/teensy-octo - Repository for the firmware / wrapper
  **/
 
 #include <Bounce.h>
 
 #define DEBOUNCE 10  // Number of ms to debounce
 #define NUMBER_OF_BUTTONS 8
-#define NUMBER_OF_LEDS 6 // 2 RGB LEDs
+#define NUMBER_OF_LEDS 6 // 2 RGB LEDs, 3 * 2
 
 // Define digital pins for the buttons
-const byte BUTTON_PINS[] = {
-  0, 1, 2, 3, 7, 8, 20, 21};
+const byte BUTTON_PINS[] = { 0, 1, 2, 3, 7, 8, 20, 21 };
 
 // Define PWM pins for the RGB LED
-// LED0-R, LED0-G, LED0-B; LED1-R, LED1-G, LED1-B
-const byte LED_PINS[] = {
-  9, 5, 10, 14, 12, 15};
+// Order: LED0-R, LED0-G, LED0-B; LED1-R, LED1-G, LED1-B
+const byte LED_PINS[] = { 9, 5, 10, 14, 12, 15 };
 
 // The Piezo buzzer sits in this PWM pin
 const byte BUZZER_PIN = 4;
 
 // Initialize button objects
+// We access the buttons through these Bounce objects
+// instead of directly reading them (see: debouncing)
 Bounce buttons[NUMBER_OF_BUTTONS] = {
   Bounce( BUTTON_PINS[0], DEBOUNCE),
   Bounce( BUTTON_PINS[1], DEBOUNCE),
@@ -49,14 +53,18 @@ Bounce buttons[NUMBER_OF_BUTTONS] = {
    * Setup function - run once on power-on
    **/
   void setup() {
+
+    // The baud rate is ignored and communication always occurs at full USB speed.
+    // http://www.pjrc.com/teensy/td_serial.html
     Serial.begin(9600);
 
-    // Initialize pushbutton pins as inputs with the internal pullup resistor enabled
+    // Initialize pushbutton pins as inputs with the internal pullup resistor enabled.
+    // http://www.pjrc.com/teensy/tutorial3.html
     for (byte i = 0; i < NUMBER_OF_BUTTONS; i++) {
       pinMode(BUTTON_PINS[i], INPUT_PULLUP);
     }
 
-    // Initialize LED pins
+    // Initialize LED pins as output
     for (byte i = 0; i < NUMBER_OF_LEDS; i++) {
       pinMode(LED_PINS[i], OUTPUT);
       analogWrite(LED_PINS[i], 255);
@@ -67,6 +75,7 @@ Bounce buttons[NUMBER_OF_BUTTONS] = {
     Serial.print(millis());
     Serial.println("ms - which is amazingly fast.");
 
+    Serial.println();
     printHelp();
     Serial.println("");
     Serial.println("Waiting for button presses or serial commands.");
@@ -82,7 +91,7 @@ void loop()
   // Detect and handle button presses
   processButtonPress();
 
-  // Receive and proccess commands sent from the PC over serial
+  // Receive and process commands sent from the PC over serial
   processSerialCommand();
 
   delay(5);
@@ -158,19 +167,18 @@ String getToken(String data, int index)
 {
   char separator = ' ';
   int found = 0;
-  int strIndex[] = {
-    0, -1  };
-  int maxIndex = data.length()-1;
+  int strIndex[] = { 0, -1  };
+  int maxIndex = data.length() - 1;
 
-  for(int i=0; i<=maxIndex && found<=index; i++){
-    if(data.charAt(i)==separator || i==maxIndex){
+  for(int i = 0; i <= maxIndex && found <= index; i++){
+    if(data.charAt(i) == separator || i == maxIndex){
       found++;
       strIndex[0] = strIndex[1]+1;
-      strIndex[1] = (i == maxIndex) ? i+1 : i;
+      strIndex[1] = (i == maxIndex) ? i + 1 : i;
     }
   }
 
-  return found>index ? data.substring(strIndex[0], strIndex[1]) : "";
+  return found > index ? data.substring(strIndex[0], strIndex[1]) : "";
 }
 
 /**
@@ -213,7 +221,7 @@ void processSerialCommand(){
     buzz(param1, param2);
     endWork();
   } 
-  else if (command == "nobuzz") {
+  else if (command == "nobuzz") { // Stop the buzzer
     startWork();
     noBuzz();
     endWork();
@@ -331,4 +339,3 @@ void kristo(){
     delay(duration*1.2);
   }
 }
-
