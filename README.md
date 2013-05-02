@@ -1,6 +1,6 @@
 # Teensy Octo
 
-A USB IO device for developers. Packaged as a cute eight-legged creature, this device connects to your USB port to do your bidding. Press any of the eight legs to activate pre-programmed commands or use your computer to control one of its three output devices as an indicator of interesting events in the virtual world.
+A USB IO device for developers. Packaged as a cute eight-legged creature, this device connects to your USB port to do your bidding. Press any of the eight legs to activate pre-programmed commands or write software to one of its three output devices as an indicator of interesting events in the virtual world.
 
 The hardware and software are open to hacking. The user has to program the macros for each button himself.
 
@@ -74,7 +74,7 @@ Use those basic building blocks to conquer the world.
 
 # Project Files
 
-* octo.pdf - The schematic for the electronics, also available at CircuitLab
+* octo.pdf - The schematic for the electronics, also [available at CircuitLab](https://www.circuitlab.com/circuit/s6dr46/octo/)
 * teensy_octo.ino - C / Arduino compatible code for the firmware
 * python/cli.py - A CLI wrapper for controlling the output devices on the Octo
 * python/example.py - An example implementation of using the `Octo` library. Contains a `ButtonHandler` that reacts to button presses.
@@ -85,6 +85,7 @@ Use those basic building blocks to conquer the world.
 
 * The buzz function causes LED1 to light as RED.
 * Sending serial commands too fast (before the device responds with the ready message) won't work
+* LED brightness can not be controlled with steps of 1 in the range of 0..255
 
 # Hacking
 

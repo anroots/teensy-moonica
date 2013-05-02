@@ -10,8 +10,11 @@ import time
 
 class Octo:
 
+    # Use those constants for button states
     BUTTON_PRESSED = 1
     BUTTON_RELEASED = 2
+
+    # How many ms to wait between commands (for not overflowing the buffers)
     DELAY = 0.4
 
     def __init__(self, address):
