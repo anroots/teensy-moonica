@@ -1,6 +1,8 @@
 # Teensy Octo
 
-I am a cute monster who feeds off of your USB port.
+A USB IO device for developers. Packaged as a cute eight-legged creature, this device connects to your USB port to do your bidding. Press any of the eight legs to activate pre-programmed commands or use your computer to control one of its three output devices as an indicator of interesting events in the virtual world.
+
+The hardware and software are open to hacking. The user has to program the macros for each button himself.
 
 ## Hardware Specs
 
@@ -9,6 +11,10 @@ I am a cute monster who feeds off of your USB port.
 * 2 individually controller PWM RGB LEDs
 * A Piezo Buzzer
 
+## External Input Device
+
+The computer recognizes the Teensy as a gamepad/joystic type of device. By default it's programmed to send joystick button press events on each button press. Open the gamepad config window from your control panel to see the mapping.
+
 ## Serial Communication
 
 The device communicates with the computer over serial. Information is sent in both direction:
@@ -16,11 +22,29 @@ The device communicates with the computer over serial. Information is sent in bo
 * Octo -> PC: Button press / button release events
 * PC -> Octo: LED / Buzzer control
 
+### Initialization message
+
+```
+Teensy Octo; booted in 200ms - which is amazingly fast.
+
+
+=== Available serial commands: ===
+
+buzz frequency duration
+nobuzz
+led0 r g b
+led1 r g b
+
+More info: http://github.com/anroots/teensy-octo
+
+Waiting for button presses or serial commands.
+```
+
 ## Python Wrapper Object
 
 The `Octo` class in `octo.py` wraps serial communication into a easy-to-use object with methods to control the output devices and read switch state transactions.
 
-## CLI Usage
+### CLI Usage
 
 The `cli.py` file provides a convinient way to control the Teensy via the command line.
 
@@ -64,14 +88,14 @@ Use those basic building blocks to conquer the world.
 
 # Hacking
 
-* Follow the guide to customize the firmware
-* Write your own `ButtonHandler` classes
-* Write a plugin-based architecture that'd allow multiple modules to run simultaneously
+* Follow [the guide](http://www.pjrc.com/teensy/loader.html) to customize the firmware
+* Write your own `ButtonHandler` class(es)
+* Use the observer pattern and write a plugin-based architecture that'd allow multiple modules to run simultaneously
 
 ## Ideas
 
 * A new Facebook message / Tweet / mail notifier
-* Unittest runner with visual / audio feedback
+* Unittest runner with visual / audio feedback (PHPUnit)
 * IO device for starting / stopping system (or remote) services
 * HCI device for preprogrammed text input (can act as an external keyboard)
 * Mood light
@@ -81,5 +105,5 @@ Use those basic building blocks to conquer the world.
 
 # Authors
 
-* Ando Roots [http://sqroot.eu] (programming, electronics)
-* Valeria Gasik [http://sokeri.org] (design, sewing)
+* [Ando Roots](http://sqroot.eu)
+* [Valeria Gasik](http://sokeri.org)

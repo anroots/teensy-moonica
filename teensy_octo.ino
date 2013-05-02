@@ -17,6 +17,7 @@
  * http://www.pjrc.com/teensy/pinout.html - Teensy pinout diagram
  * http://www.pjrc.com/teensy/td_usage.html - Reprogramming
  * https://github.com/anroots/teensy-octo - Repository for the firmware / wrapper
+ * https://www.circuitlab.com/circuit/s6dr46/octo/ - Circuit diagram
  **/
 
 #include <Bounce.h>
@@ -71,7 +72,7 @@ Bounce buttons[NUMBER_OF_BUTTONS] = {
     }
 
     // Print welcome message over serial
-    Serial.print("Teensy Octo by A. Roots 2013. Booted in ");
+    Serial.print("Teensy Octo; booted in ");
     Serial.print(millis());
     Serial.println("ms - which is amazingly fast.");
 
