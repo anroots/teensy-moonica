@@ -70,17 +70,6 @@ Bounce buttons[NUMBER_OF_BUTTONS] = {
       pinMode(LED_PINS[i], OUTPUT);
       analogWrite(LED_PINS[i], 255);
     }
-
-    // Print welcome message over serial
-    Serial.print("Teensy Octo; booted in ");
-    Serial.print(millis());
-    Serial.println("ms - which is amazingly fast.");
-
-    Serial.println();
-    printHelp();
-    Serial.println("");
-    Serial.println("Waiting for button presses or serial commands.");
-    Serial.println("");
   }
 
 /**
@@ -218,68 +207,25 @@ void processSerialCommand(){
   unsigned long param3 = stringToInt(getToken(serialInput, 3));
 
   if (command == "buzz"){ // Make sound
-    startWork();
     buzz(param1, param2);
-    endWork();
   } 
   else if (command == "nobuzz") { // Stop the buzzer
-    startWork();
     noBuzz();
-    endWork();
   } 
   else if (command == "led0") { // Light LED
-    startWork();
     setLED(param1 > 255 ? 255 : param1, param2 > 255 ? 255 : param2, param3 > 255 ? 255 : param3, 0);
-    endWork();
   } 
   else if (command == "led1") {
-    startWork();
     setLED(param1, param2, param3, 1);
-    endWork();
-  } 
-  else if (command == "help") { // Get help
-    printHelp();
-  } 
-  else if (command == "kristo"){ // Easter egg
-    startWork();
+  }
+  else if (command == "kristo"){ // Easter egg command
     kristo();
-    endWork();
-  } 
+  }
   else {
-    Serial.print("Unknown command: "); 
-    Serial.println(command);
+    Serial.println(-1); // Error
   }
 }
 
-
-/**
- * Print short help message
- **/
-void printHelp(){
-  Serial.println("");
-  Serial.println("=== Available serial commands: ===");
-  Serial.println("");
-  Serial.println("buzz frequency duration");
-  Serial.println("nobuzz");
-  Serial.println("led0 r g b");
-  Serial.println("led1 r g b");
-  Serial.println("");
-  Serial.println("More info: http://github.com/anroots/teensy-octo");  
-}
-
-/**
- * Indicate that the device is currently busy
- **/
-void startWork(){
-  Serial.println("Working...");
-}
-
-/**
- * Indicate that the device is ready to receive commands
- **/
-void endWork(){
-  Serial.println("Ready.");
-}
 
 /**
  * Convert a string into an integer
