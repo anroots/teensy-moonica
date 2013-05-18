@@ -36,16 +36,41 @@ def main():
             sys.stdout.flush()
             octo.led(255 - r, 255, 255, i)
             time.sleep(0.01)
+        print ""
+
+        for g in range(0, 255):
+            sys.stdout.write("LED %s, GREEN: %s%%\r" % (i, g * 100 / 255))
+            sys.stdout.flush()
+            octo.led(255, 255 - g, 255, i)
+            time.sleep(0.01)
+        print ""
+
+        for b in range(0, 255):
+            sys.stdout.write("LED %s, BLUE: %s%%\r" % (i, b * 100 / 255))
+            sys.stdout.flush()
+            octo.led(255, 255, 255 - b, i)
+            time.sleep(0.01)
+        print ""
 
         reset()
 
-    # Done
-    for i in range(0, 3):
-        octo.buzz(3000, 100)
-        time.sleep(0.500)
+    print "Testing buzzer"
+    for i in range(0, 10000, 1000):
+        octo.buzz(i, 100)
+        time.sleep(octo.DELAY)
+
+    print "Testing buttons"
+    for i in range(0, 8):
+        sys.stdout.write("Press button %s..." % i)
+        sys.stdout.flush()
+
+        while not octo.read_button(i):
+            time.sleep(0.1)
+        print " OK"
 
     print "Test suite completed"
     reset()
+
 
 def reset():
     octo.reset()
@@ -53,7 +78,7 @@ def reset():
 
 def hold():
     #raw_input("[press ENTER]")
-    time.sleep(0.4)
+    time.sleep(0.2)
 
 
 if __name__ == '__main__':

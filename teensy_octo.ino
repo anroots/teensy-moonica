@@ -18,6 +18,7 @@
  * http://www.pjrc.com/teensy/td_usage.html - Reprogramming
  * https://github.com/anroots/teensy-octo - Repository for the firmware / wrapper
  * https://www.circuitlab.com/circuit/s6dr46/octo/ - Circuit diagram
+ * http://www.youtube.com/watch?v=Cy9MIoG5z4s - Using bytes to represent 8 key states
  **/
 
 #include <Bounce.h>
@@ -83,8 +84,6 @@ void loop()
 
   // Receive and process commands sent from the PC over serial
   processSerialCommand();
-
-  delay(5);
 }
 
 /**
@@ -92,24 +91,30 @@ void loop()
  **/
 void processButtonPress() {
 
+  // Stores last sent byte for comparison, we'll only send data when button state(s) change
+  static byte previous = 0;
+
+  // Represents all 8 button states
+  byte response = 0;
   for (int i = 0; i < NUMBER_OF_BUTTONS; i++) {
+    buttons[i].update();
 
-    if (buttons[i].update()) { // If button state changed...
-
-      byte buttonNumber = i+1;
-
-      if (buttons[i].fallingEdge()) { // Pressed 
-        Joystick.button(buttonNumber, 1);
-        Serial.print("buttonPress: ");
-        Serial.println(buttonNumber);
-
-      } 
-      else { // Released
-        Joystick.button(buttonNumber, 0);
-        Serial.print("buttonRelease: ");
-        Serial.println(buttonNumber);
-      }
+    if (buttons[i].read()) { // Button closed
+      // Just shift the bits, filling in a 0 in that spot.
+      response = response << 1;
+      Joystick.button(i+2, 1);
+    } else { // Button open
+      // Shift all bits to the left one spot. Has no real effect on first iteration (0=00000000)
+      response = response << 1;
+      // Set the last bit to one by adding the int 1 to response.
+      response += 1;
+      Joystick.button(i+2, 0);
     }
+  }
+
+  if (response != previous){
+    Serial.write(response);
+    previous = response;
   }
 }
 
@@ -222,7 +227,7 @@ void processSerialCommand(){
     kristo();
   }
   else {
-    Serial.println(-1); // Error
+    buzz(1000, 100); // Error
   }
 }
 

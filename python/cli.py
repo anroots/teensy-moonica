@@ -9,6 +9,7 @@ import argparse
 import sys
 from octo import Octo
 
+
 def main(args):
     """
     Parse CLI args and pass them to the Octo library
@@ -21,15 +22,16 @@ def main(args):
     elif '--silence' in sys.argv:
         octo.nobuzz()
     elif '--led0' in sys.argv:
-        octo.led0(args.led[0],args.led[1],args.led[2])
+        octo.led0(args.led[0], args.led[1], args.led[2])
     elif '--led1' in sys.argv:
-        octo.led1(args.led[0],args.led[1],args.led[2])
+        octo.led1(args.led[0], args.led[1], args.led[2])
     elif '--command' in sys.argv:
         octo.send_raw(args.command[0])
     elif '--reset' in sys.argv[0]:
         octo.reset()
     else:
         print "Unknown command"
+
 # Init
 if __name__ == '__main__':
 
@@ -44,17 +46,17 @@ if __name__ == '__main__':
                         help='Specify the serial interface address. Defaults to /dev/ttyACM0',
                         default='/dev/ttyACM0')
 
-    parser.add_argument('--led0', nargs=3, type=int, metavar=('r','g','b'), dest='led',
-                    help='Set LED 0 to the specified RGB levels (from range 0 - 255)')
+    parser.add_argument('--led0', nargs=3, type=int, metavar=('r', 'g', 'b'), dest='led',
+                        help='Set LED 0 to the specified RGB levels (from range 0 - 255)')
 
-    parser.add_argument('--led1', nargs=3, type=int, metavar=('r','g','b'), dest='led',
-                    help='Set LED 1 to the specified RGB levels (from range 0 - 255)')
+    parser.add_argument('--led1', nargs=3, type=int, metavar=('r', 'g', 'b'), dest='led',
+                        help='Set LED 1 to the specified RGB levels (from range 0 - 255)')
 
     parser.add_argument('--buzz', nargs=2, type=int,
                         help='Activate the buzzer at the specified frequency (Hz) for the specified duration (ms)',
-                        metavar=('freq','dur'))
+                        metavar=('freq', 'dur'))
 
-    parser.add_argument('--command',nargs=1, help='Send a raw serial command string to the Octo')
+    parser.add_argument('--command', nargs=1, help='Send a raw serial command string to the Octo')
 
     parser.add_argument('--silence', action='store_true',
                         help='Stop the buzzer')

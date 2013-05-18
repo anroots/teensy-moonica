@@ -8,21 +8,33 @@ import serial
 import sys
 import time
 
-class Octo:
 
+class Octo:
     # Use those constants for button states
-    BUTTON_PRESSED = 1
-    BUTTON_RELEASED = 2
+    BUTTON_CLOSED = True
+    BUTTON_OPEN = False
 
     # How many ms to wait between commands (for not overflowing the buffers)
     DELAY = 0.4
 
+    # Stores last known button states (dict, key=button number, val=button state constant)
+    button_states = None
+
     def __init__(self, address):
         try:
-            self.ser = serial.Serial(address, 9600, timeout=3)
+            self.ser = serial.Serial(address, 9600, timeout=2)
         except:
             print "Could not open address %s" % address
             sys.exit(1)
+
+        # Default value for all buttons - not pressed
+        self.button_states = dict(zip(range(0, 8), [self.BUTTON_OPEN] * 8))
+
+        # Allow to reset after a serial connection
+        time.sleep(1)
+
+        # Clear the buffer
+        self.ser.flushInput()
 
     def buzz(self, freq, duration):
         """
@@ -61,7 +73,7 @@ class Octo:
         :param b: Blue value, 0 - 255
         :param num: Either 0 or 1, specifies the LED to set
         """
-        command = "%s %s %s %s" % ("led"+str(num), r, g, b)
+        command = "%s %s %s %s" % ("led" + str(num), r, g, b)
         self.ser.write(command)
 
     def nobuzz(self):
@@ -72,22 +84,42 @@ class Octo:
 
     def read_buttons(self):
         """
-        Read the buttons and try to return the pressed (active) button and its state.
-        If no button is currently pressed / released, return False
-        :return: An array of two values, the first being the button number [1..8], the second one of the state constants
+        Get information about the state of each of the device buttons
+
+        :return: A dict of 8 values where keys are button numbers and values last known states
         """
-        serial_data = self.read_raw().strip()
+        # No data sent via serial, use last known values
+        if not self.ser.inWaiting():
+            return self.button_states
 
-        if len(serial_data) == 0:
-            return False
+        # Read a single byte from the serial buffer
+        buttons_byte = self.ser.read(1)
 
-        # The Teensy sends us events on button press / release
-        if "buttonPress: " in serial_data:
-            return [int(serial_data[13]), self.BUTTON_PRESSED] # Parse out btn number
-        elif "buttonRelease: " in serial_data:
-            return [int(serial_data[15]), self.BUTTON_RELEASED]
+        # Convert the byte into a binary string with a length of 8 (00101110)
+        button_bits = str(bin(int(buttons_byte.encode('hex')[0:2], 16))[2:])
 
-        return False
+        # Zero-fill the bit-string (or the leading zeros would be lost)
+        button_bits = button_bits.zfill(8)
+
+        # Convert the bits into a list where the state of each button is represented by a boolean value
+        button_states = map(lambda bit: bit == '1', button_bits)
+
+        # Convert the list into a dict where button number is mapped to its state
+        button_states = dict(zip(range(0, 8), button_states))
+
+        # Save the reading for future use (when there is no serial input available from the device)
+        self.button_states = button_states
+
+        return button_states
+
+    def read_button(self, button_number):
+        """
+        Get the status of the specified button (either open or closed)
+
+        :param button_number: Button number, from 0..7
+        :return: Either BUTTON_OPEN or BUTTON_CLOSED
+        """
+        return self.read_buttons()[button_number]
 
     def read_raw(self):
         """
@@ -96,7 +128,7 @@ class Octo:
         """
         return self.ser.readline().strip('\n')
 
-    def send_raw(self,string):
+    def send_raw(self, string):
         """
         Send a raw serial command to the Octo
         :param string:
@@ -119,5 +151,5 @@ class Octo:
         """
         Close serial port on class destruction
         """
-        if hasattr(self,'ser'):
+        if hasattr(self, 'ser'):
             self.ser.close()
