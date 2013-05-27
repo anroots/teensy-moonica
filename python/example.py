@@ -7,43 +7,18 @@ based on which button was pressed
 import time
 import urllib2
 from octo import Octo
+from listener import ButtonListener
 
 
 def main():
-    # Initialize the Octo library
     octo = Octo('/dev/ttyACM0')
     octo.reset()
 
-    # Initialize the button handler class
-    button_handler = ButtonHandler(octo)
+    handler = ButtonHandler(octo)
+    listener = ButtonListener(octo, handler)
 
-    # Store previous read states (enables to detect falling/rising edges, we only want to do some action once)
-    previous_states = octo.read_buttons()
+    listener.run()
 
-    while True:
-        time.sleep(0.3)
-        current_states = octo.read_buttons()
-
-        for button_number in current_states:
-
-            # Determine the state of the button - either being pressed or released
-            if previous_states[button_number] is Octo.BUTTON_OPEN and current_states[
-                button_number] is Octo.BUTTON_CLOSED:
-                state_name = "press"
-            elif previous_states[button_number] is Octo.BUTTON_CLOSED and current_states[
-                button_number] is Octo.BUTTON_OPEN:
-                state_name = "release"
-            else:
-                continue
-
-            # Call the handler method for this button/event
-            handler_method_name = "button_%s_%s" % (str(button_number), state_name)
-            if (hasattr(button_handler, handler_method_name)):
-                getattr(button_handler, handler_method_name)()
-            else:
-                print "No handler for button %s state %s" % (str(button_number), state_name)
-
-            previous_states[button_number] = current_states[button_number]
 
 # This class defines methods for handling button events
 #
