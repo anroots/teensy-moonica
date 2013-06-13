@@ -28,7 +28,8 @@
 #define NUMBER_OF_LEDS 6 // 2 RGB LEDs, 3 * 2
 
 // Define digital pins for the buttons
-const byte BUTTON_PINS[] = { 0, 1, 2, 3, 7, 8, 20, 21 };
+//const byte BUTTON_PINS[] = { 0, 1, 2, 3, 7, 8, 20, 21 };
+const byte BUTTON_PINS[] = { 2, 0, 1, 3,  8, 7,  21, 20};
 
 // Define PWM pins for the RGB LED
 // Order: LED0-R, LED0-G, LED0-B; LED1-R, LED1-G, LED1-B
