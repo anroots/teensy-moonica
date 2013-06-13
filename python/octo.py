@@ -15,7 +15,7 @@ class Octo:
     BUTTON_OPEN = False
 
     # How many ms to wait between commands (for not overflowing the buffers)
-    DELAY = 0.4
+    DELAY = 0.3
 
     # Stores last known button states (dict, key=button number, val=button state constant)
     button_states = None

@@ -3,9 +3,15 @@
 """
 Test suite for the Teensy Octo Python library
 """
+import os
 
 import time
 import sys
+
+# Hack to import from a parent dir
+# http://stackoverflow.com/a/11158224/401554
+parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, parentdir)
 
 from octo import Octo
 

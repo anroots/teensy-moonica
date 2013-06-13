@@ -6,7 +6,7 @@ import time
 # Continuously polls Octo button presses and calls methods from the ButtonHandler class
 class ButtonListener:
 
-    def __init__(self, octo, button_handler):
+    def __init__(self, octo, button_handler, debug=True):
         """
         :param octo: Instance of the Octo class
         :param button_handler: Instance of a ButtonHandler class
@@ -14,13 +14,14 @@ class ButtonListener:
         self.button_handler = button_handler
         self.octo = octo
         self.octo.reset()
+        self.debug = debug
 
     def run(self):
         # Store previous read states (enables to detect falling/rising edges, we only want to do some action once)
         previous_states = self.octo.read_buttons()
 
         while True:
-            time.sleep(0.3)
+            time.sleep(Octo.DELAY)
             current_states = self.octo.read_buttons()
 
             for button_number in current_states:
@@ -40,6 +41,7 @@ class ButtonListener:
                 if (hasattr(self.button_handler, handler_method_name)):
                     getattr(self.button_handler, handler_method_name)()
                 else:
-                    print "No handler for button %s state %s" % (str(button_number), state_name)
+                    if self.debug:
+                        print "No handler for button %s state %s" % (str(button_number), state_name)
 
                 previous_states[button_number] = current_states[button_number]
