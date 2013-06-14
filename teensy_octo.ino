@@ -7,7 +7,7 @@
  * 
  * The microcontroller in use is Teensy 2.0 - http://www.pjrc.com/teensy
  * 
- * Created as a birthday present to Waher (http://waher.net/about-waher-net)
+ * Created as a birthday present to Waher (http://waher.net)
  * 
  * @author David <david@sqroot.eu> 2013
  * 
@@ -89,6 +89,9 @@ void loop()
 
 /**
  * Detect and handle button presses
+ *
+ * All eight button states are sent over serial only if there is a change.
+ * Also, a joystick button press is sent, the PC recognizes this as a "normal" gamepad key press
  **/
 void processButtonPress() {
 
@@ -97,6 +100,7 @@ void processButtonPress() {
 
   // Represents all 8 button states
   byte response = 0;
+  
   for (int i = 0; i < NUMBER_OF_BUTTONS; i++) {
     buttons[i].update();
 
@@ -120,7 +124,7 @@ void processButtonPress() {
 }
 
 /**
- * Set the RGB LED values
+ * Set the RGB LED values. 0 - full on; 255 - off
  *
  * r - The intensity of the RED LED, 0 - 255
  * g - The intensity of the GREEN LED, 0 - 255
@@ -137,7 +141,7 @@ void setLED(byte r, byte g, byte b, byte ledNumber) {
 /**
  * Play a sound through the Piezo buzzer
  * 
- * freq - The frequency of the tone in Hz
+ * freq - The frequency of the tone
  * duration -  The duration of the tone in milliseconds
  **/
 void buzz(unsigned long freq, unsigned long duration) { 
