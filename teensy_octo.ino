@@ -16,7 +16,7 @@
  * http://www.pjrc.com/teensy/td_libs_Bounce.html - About button bouncing
  * http://www.pjrc.com/teensy/pinout.html - Teensy pinout diagram
  * http://www.pjrc.com/teensy/td_usage.html - Reprogramming
- * https://github.com/anroots/teensy-octo - Repository for the firmware / wrapper
+ * https://github.com/anroots/teensy-moonica - Repository for the firmware / wrapper
  * https://www.circuitlab.com/circuit/s6dr46/octo/ - Circuit diagram
  * http://www.youtube.com/watch?v=Cy9MIoG5z4s - Using bytes to represent 8 key states
  **/
