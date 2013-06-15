@@ -4,9 +4,11 @@
 
 A custom-build USB IO device designed for software developers in mind.
 
-Packaged as a cute eight-legged creature, this device connects to the USB port to do your bidding. Press any of the eight legs to activate pre-programmed commands or write software to one of its three output devices as an indicator of interesting events in the virtual world.
+![Moonica](https://github.com/anroots/teensy-moonica/blob/master/img/Moonica.png)
 
-The hardware and software are open to hacking. The user has to program the macros for each button himself.
+Packaged as a cute eight-legged creature, this device connects to the USB port to do your bidding. Press any of the legs to activate pre-programmed commands or write software to one of its three output devices as an indicator of interesting events in the virtual world.
+
+The hardware and software are open to hacking. The user has to program the macros for each button.
 
 ## Hardware Specs
 
@@ -53,9 +55,9 @@ The device has three output devices: two individually controllable RGB LED-s (wi
 
 Libraries, examples and tests are provided. All of them are written in Python (with some dependencies, like `pyserial`), although any other language that supports access to the serial interface can be used.
 
-## Python Wrapper Object
+## Python Library
 
-The `Octo` class in `octo.py` wraps serial communication into a easy-to-use object with methods to control the output devices and read switch state transactions.
+The `Octo` class in `octo.py` wraps serial communication into a easy-to-use object with methods to control the output devices and read switch states.
 
 ### CLI Usage
 
@@ -87,12 +89,12 @@ Use those basic building blocks to conquer the world.
 
 # Project Files
 
-* octo.pdf - The schematic for the electronics, also [available at CircuitLab](https://www.circuitlab.com/circuit/s6dr46/octo/)
+* schematic.pdf - The schematic for the electronics, also [available at CircuitLab](https://www.circuitlab.com/circuit/s6dr46/teensy-moonica/)
 * teensy_octo.ino - C / Arduino compatible code for the firmware
 * python/cli.py - A CLI wrapper for controlling the output devices on the Octo
 * python/examples/ - Different examples on some use cases
 * python/tests - Various test suites for testing the hardware (mostly during development)
-* python/octo.py - A Python wrapper for controlling the output devices and reading button state changes
+* python/octo.py - A Python library for controlling the output devices and reading button state changes
 
 # Known bugs
 
@@ -121,6 +123,7 @@ Use those basic building blocks to conquer the world.
 # Afterword
 
 Happy (late) birthday, [Waher](http://waher.net).
+
 Licenced under the MIT licence.
 
 ## Authors
