@@ -4,7 +4,7 @@
 
 A custom-build USB IO device designed for software developers in mind.
 
-![Moonica](https://github.com/anroots/teensy-moonica/blob/master/img/Moonica.png)
+![Moonica](https://raw.github.com/anroots/teensy-moonica/master/img/Moonica.jpg)
 
 Packaged as a cute eight-legged creature, this device connects to the USB port to do your bidding. Press any of the legs to activate pre-programmed commands or write software to one of its three output devices as an indicator of interesting events in the virtual world.
 
