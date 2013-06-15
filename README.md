@@ -1,4 +1,6 @@
-# Teensy Octo
+# Moonica
+
+*aka the Teensy Octo*
 
 A custom-build USB IO device designed for software developers in mind.
 
