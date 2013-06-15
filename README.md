@@ -1,6 +1,8 @@
 # Teensy Octo
 
-A USB IO device for a developer. Packaged as a cute eight-legged creature, this device connects to the USB port to do your bidding. Press any of the eight legs to activate pre-programmed commands or write software to one of its three output devices as an indicator of interesting events in the virtual world.
+A custom-build USB IO device designed for software developers in mind.
+
+Packaged as a cute eight-legged creature, this device connects to the USB port to do your bidding. Press any of the eight legs to activate pre-programmed commands or write software to one of its three output devices as an indicator of interesting events in the virtual world.
 
 The hardware and software are open to hacking. The user has to program the macros for each button himself.
 
@@ -23,7 +25,7 @@ The hardware and software are open to hacking. The user has to program the macro
 ## As an external Input Device
 
 The computer recognizes the Teensy as a gamepad/joystic type of device. By default it's programmed to send joystick button press events on each button press. Open the gamepad config window from your control panel to see the mapping.
-Some 3rd party shortcut biner application can be used to map joystick events to useful actions on the PC - without writing any software.
+Some 3rd party shortcut binder application can be used to map joystick events to useful actions on the PC - without writing any software.
 
 ## Serial Communication
 
@@ -34,12 +36,16 @@ The device communicates with the computer over serial. Information is sent in bo
 
 The Teensy sends a byte over serial each time one of its button states change. The byte represents all (current) button states at once (`01000001` means that the second and the last button are currently pressed). 
 
+# Output
+
 Serial commands can be sent to the device using any library / wrapper. The following commands are recognized by the Teensy:
 
 * buzz frequency duration
 * nobuzz
 * led0 r g b
 * led1 r g b
+
+The device has three output devices: two individually controllable RGB LED-s (with adjustable brightness) and a Piezo buzzer for sound output.
 
 # Libraries
 
@@ -112,9 +118,10 @@ Use those basic building blocks to conquer the world.
 
 # Afterword
 
-Happy (late) birthday, [Waher](http://waher.net). Licenced under the MIT licence.
+Happy (late) birthday, [Waher](http://waher.net).
+Licenced under the MIT licence.
 
 ## Authors
 
 * [Ando Roots](http://sqroot.eu)
-* [Valeria Gasik](http://sokeri.org)/
+* [Valeria Gasik](http://sokeri.org)
